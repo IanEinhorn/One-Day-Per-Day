@@ -1,0 +1,11 @@
+###############################################################################
+#
+#Configuratoin for One Day
+#Add Groupme API Key and Bot ID number from https://dev.groupme.com/
+# 
+###############################################################################
+
+API_KEY = 'Super secret API key'
+BOT_ID = "Bot ID"
+FONT = 'MICROSS.TTF'
+
