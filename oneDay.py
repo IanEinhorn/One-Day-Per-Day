@@ -4,12 +4,12 @@ import calendar as cal
 import requests, json
 from PIL import Image, ImageDraw, ImageFont
 from conf import API_KEY,BOT_ID,FONT
-
+from ddate.base import DDate
 TEXT_COLOR = (0,0,0)
 BG_COLOR = (255,255,255)
 IMAGEFILE = 'oneDay.png'
 WRONGPROBABILITY = 10
-GREGORIANPROBABILITY = 90
+GREGORIANPROBABILITY = 86
 
 
 def generateDate():
@@ -26,9 +26,19 @@ def formatCalendar(day):
 	if chance <= GREGORIANPROBABILITY:
 		return gregorianCalendar(day)
 	else:# chance > GREGORIANPROBABILITY
-		return julianDayNumber(day)
+		return discordianCalendar(day) if chance <= 95 else julianDayNumber(day)
 
 
+def discordianCalendar(day):
+	dayInfo = {}
+	discordianDay = DDate(day)
+	dayInfo['DayName'] = DDate.WEEKDAYS[discordianDay.day_of_week]
+	dayInfo['MonthName'] = DDate.SEASONS[discordianDay.season]
+	dayInfo['DayNum'] =  str(discordianDay.day_of_season)
+	dayInfo['MonthNum'] = str(discordianDay.season)
+	dayInfo['YearNum'] = 'YOLD '+str(discordianDay.year)
+	dayInfo['Format'] = 'Discordian'
+	return dayInfo
 
 def gregorianCalendar(day):
 	dayInfo = {}
@@ -37,8 +47,9 @@ def gregorianCalendar(day):
 	dayInfo['DayNum'] =  str(day.day)
 	dayInfo['MonthNum'] = str(day.month)
 	dayInfo['YearNum'] = str(day.year)
-	dayInfo['dateObject'] = day
+	dayInfo['Format'] = 'Gregorian'
 	return dayInfo
+
 
 def julianDayNumber(day):
 	dayInfo = {}
@@ -51,7 +62,7 @@ def julianDayNumber(day):
 	dayInfo['DayNum'] =  str(jdn)
 	dayInfo['MonthNum'] = str(0)
 	dayInfo['YearNum'] = ''
-	dayInfo['dateObject'] = day
+	dayInfo['Format'] = 'Julian Day Number'
 	return dayInfo
 
 
@@ -142,11 +153,12 @@ def testFormatCalendar():
 		#print 'Today is '+f['DayName']+', '+str(f['DayNum'])+' day of '+f['MonthName']+', '+str(f['yearNum'])
 def testmakeSquare():
 	t = generateDate()
-	f = formatCalendar(t)
+	f = discordianCalendar(t)
+	#f = formatCalendar(t)
 	print f
 	makeSquare(f)
 
 if __name__ == '__main__':
-	#oneDayPerDay()
-	testFormatCalendar()
-
+	oneDayPerDay()
+	#testFormatCalendar()
+    #testmakeSquare()
