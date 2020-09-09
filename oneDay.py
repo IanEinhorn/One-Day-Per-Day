@@ -1,3 +1,4 @@
+import sys
 import random
 from datetime import date, timedelta
 import calendar as cal
@@ -8,7 +9,7 @@ from ddate.base import DDate
 TEXT_COLOR = (0,0,0)
 BG_COLOR = (255,255,255)
 IMAGEFILE = 'oneDay.png'
-WRONGPROBABILITY = 10
+WRONGPROBABILITY = 11
 GREGORIANPROBABILITY = 86
 
 
@@ -67,17 +68,24 @@ def julianDayNumber(day):
 
 
 def march(day):
-    dayDelta = day - date(2020,2,29)
-    if(dayDelta.days < 0):
+    print day,
+    if(day < date(2020,2,29)):
         gregorianCalendar(day)
     else:
+        monthYear = ((day.year-1)%12)
+        if monthYear > day.month: #last Year's Month Hasnt ended, use previous year
+            month = (day.year-2)%12
+            startOrd = date(day.year-1, (month), 1).toordinal() - 1
+        else: # The monthYear started this year
+            month = (day.year-1)%12
+            startOrd = date(day.year, ((day.year-1)%12), 1).toordinal() - 1
         dayInfo = {}
         dayInfo['DayName'] = cal.day_name[day.weekday()]
-        dayInfo['MonthName'] = 'March'
-        dayInfo['DayNum'] =  str(dayDelta.days)
-        dayInfo['MonthNum'] = '3'
-        dayInfo['YearNum'] = '2020'
-        dayInfo['Format'] = 'Gregorian'
+        dayInfo['MonthName'] = cal.month_name[month]
+        dayInfo['DayNum'] =  str(day.toordinal()-startOrd)
+        dayInfo['MonthNum'] = month
+        dayInfo['YearNum'] = ''
+        dayInfo['Format'] = 'March'
         return dayInfo
 
 
@@ -141,7 +149,7 @@ def groupmePostMessage(imageURL = None,text = None):
 
 def oneDayPerDay(Day=None):
     if Day: #if a Day is specified, ensure it is the correct format and use it
-        if (type(Day) == isinstance(Day,tuple) and len(Day)==3):
+        if (tyfpe(Day) == isinstance(Day,tuple) and len(Day)==3):
             Day = date(Day[0],Day[1],Day[2])  
         else: #day is invalid
             print "Invalid Day specified, Please use '(YYYY,MM,D)'"
@@ -163,9 +171,20 @@ def testGenerateDate():
 def testFormatCalendar():
     for i in xrange(100):
         t = generateDate()
-        f = formatCalendar(t)
+        #f = formatCalendar(t)
+        f = march(t)
         print f
         #print 'Today is '+f['DayName']+', '+str(f['DayNum'])+' day of '+f['MonthName']+', '+str(f['yearNum'])
+
+def testMarch():
+    for i in xrange(100):
+        t = generateDate()
+        #f = formatCalendar(t)
+        f = march(t)
+        print f
+        #print 'Today is '+f['DayName']+', '+str(f['DayNum'])+' day of '+f['MonthName']+', '+str(f['yearNum'])
+
+
 def testmakeSquare():
     t = generateDate()
     f = march(t)
@@ -174,7 +193,13 @@ def testmakeSquare():
     print f
     makeSquare(f)
 
+
 if __name__ == '__main__':
-    oneDayPerDay()
-    #testFormatCalendar()
-    #testmakeSquare()
+    if '-d' in sys.argv: #flags to only run part of the code
+        #testFormatCalendar()
+        #testmakeSquare()
+        testMarch()
+    else: #post to groupme
+        oneDayPerDay()
+
+
