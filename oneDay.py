@@ -126,7 +126,6 @@ def groupmePostImage():
                         data=data,
                         headers={'Content-Type': 'image/png',
                                 'X-Access-Token': API_KEY})
-    print res.content
     url=res.json()[u'payload'][u'url']
     print url
     return url
@@ -140,10 +139,10 @@ def groupmePostMessage(imageURL = None,text = None):
         data['picture_url'] = imageURL
         print imageURL
     if text or imageURL:
-        print 'Posting'
+        print 'Posting:'
         res = requests.post(
             url='https://api.groupme.com/v3/bots/post',
-            data=data)
+            json=data)
         print res.content
 
 
