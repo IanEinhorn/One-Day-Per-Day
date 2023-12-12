@@ -68,7 +68,7 @@ def julianDayNumber(day):
 
 
 def march(day):
-    print day,
+    print(day),
     if(day < date(2020,2,29)):
         gregorianCalendar(day)
     else:
@@ -104,11 +104,11 @@ def makeSquare(calendarDay):
     
     #Day Number, corrected for font size and centered
     dayFont = FONT75 if len(calendarDay['DayNum']) < 5 else FONT40
-    w,h=draw.textsize(calendarDay['DayNum'],dayFont)
+    w=draw.textlength(calendarDay['DayNum'],dayFont)
     draw.text(((100-w/2),70),calendarDay['DayNum'],fill = TEXT_COLOR, font = dayFont)
     
     #Year, centered
-    w,h=draw.textsize(calendarDay['YearNum'],FONT20)
+    w=draw.textlength(calendarDay['YearNum'],FONT20)
     draw.text(((100-w/2),165),calendarDay['YearNum'],fill = TEXT_COLOR, font = FONT20)
     
     #Outline
@@ -127,23 +127,23 @@ def groupmePostImage():
                         headers={'Content-Type': 'image/png',
                                 'X-Access-Token': API_KEY})
     url=res.json()[u'payload'][u'url']
-    print url
+    print(url)
     return url
 
 def groupmePostMessage(imageURL = None,text = None):
     data = data={'Content-Type': 'application/json', 'bot_id' : BOT_ID}
     if text:
         data['text'] = text
-        print text
+        print(text)
     if imageURL:
         data['picture_url'] = imageURL
-        print imageURL
+        print(imageURL)
     if text or imageURL:
-        print 'Posting:'
+        print('Posting:')
         res = requests.post(
             url='https://api.groupme.com/v3/bots/post',
             json=data)
-        print res.content
+        print(res.content)
 
 
 def oneDayPerDay(Day=None):
@@ -151,36 +151,36 @@ def oneDayPerDay(Day=None):
         if (tyfpe(Day) == isinstance(Day,tuple) and len(Day)==3):
             Day = date(Day[0],Day[1],Day[2])  
         else: #day is invalid
-            print "Invalid Day specified, Please use '(YYYY,MM,D)'"
+            print("Invalid Day specified, Please use '(YYYY,MM,D)'")
     else: #No Date is specified, Genterate one
             Day = generateDate()
-    print Day
+    print(Day)
     calendarDay = formatCalendar(Day)
-    print calendarDay['DayName'],calendarDay['MonthName'],calendarDay['DayNum'],',',calendarDay['YearNum']
+    print(calendarDay['DayName'],calendarDay['MonthName'],calendarDay['DayNum'],',',calendarDay['YearNum'])
     makeSquare(calendarDay)
     url = groupmePostImage()
     groupmePostMessage(url)
-    print 'Done'
+    print('Done')
 
 
 #Test functions
 def testGenerateDate():
-    for i in xrange(100):
-        print generateDate()
+    for i in range(100):
+        print(generateDate())
 def testFormatCalendar():
-    for i in xrange(100):
+    for i in range(100):
         t = generateDate()
         #f = formatCalendar(t)
         f = march(t)
-        print f
+        print(f)
         #print 'Today is '+f['DayName']+', '+str(f['DayNum'])+' day of '+f['MonthName']+', '+str(f['yearNum'])
 
 def testMarch():
-    for i in xrange(100):
+    for i in range(100):
         t = generateDate()
         #f = formatCalendar(t)
         f = march(t)
-        print f
+        print(f)
         #print 'Today is '+f['DayName']+', '+str(f['DayNum'])+' day of '+f['MonthName']+', '+str(f['yearNum'])
 
 
@@ -188,8 +188,8 @@ def testmakeSquare():
     t = generateDate()
     f = march(t)
     #f = formatCalendar(t)
-    print t
-    print f
+    print(t)
+    print(f)
     makeSquare(f)
 
 
