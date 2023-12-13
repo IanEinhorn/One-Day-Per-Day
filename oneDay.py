@@ -4,13 +4,16 @@ from datetime import date, timedelta
 import calendar as cal
 import requests, json
 from PIL import Image, ImageDraw, ImageFont
-from conf import API_KEY,BOT_ID,FONT
+from conf import GME,GME_API_KEY,GME_BOT_ID,FONT,TG,TG_TOKEN,TG_CHAT_ID
 from ddate.base import DDate
+from io import BytesIO
 TEXT_COLOR = (0,0,0)
 BG_COLOR = (255,255,255)
 IMAGEFILE = 'oneDay.png'
 WRONGPROBABILITY = 11
 GREGORIANPROBABILITY = 86
+
+
 
 
 def generateDate():
@@ -91,9 +94,10 @@ def march(day):
 
 def makeSquare(calendarDay):
     '''Takes in a dict of info about a day and formats it into a calendar square image'''
+    img = Image.new(mode = 'RGB', size=(200,200), color = BG_COLOR) #set up Canvas for future drawing
     #Font definitions and Canvas setup
     FONT20 = ImageFont.truetype(font = FONT,size = 20)
-    FONT40 = ImageFont.truetype(font = FONT,size = 40)
+    FONT40 = ImageFont.truetype(font = FONT,size = 40)  
     FONT75 = ImageFont.truetype(font = FONT,size = 80)
     img = Image.new(mode = 'RGB', size=(200,200), color = BG_COLOR)
     draw = ImageDraw.Draw(img)
@@ -118,6 +122,18 @@ def makeSquare(calendarDay):
     draw.rectangle([3,3,196,196],fill = None,outline = TEXT_COLOR)
     #Save output
     img.save('img.png')
+    return img
+
+
+def telegramPostImage(img):
+    print('Uplaoding to Telegram')
+    SEND_PHOTO = f'https://api.telegram.org/bot'+TG_TOKEN+'/sendPhoto'
+    with BytesIO() as output:
+        img.save(output, format='JPEG')
+        output.seek(0)
+        res =  requests.post(SEND_PHOTO, data={'chat_id': TG_CHAT_ID}, files={'photo': output.read()})
+        print(res)
+
 
 
 def groupmePostImage():
@@ -125,13 +141,13 @@ def groupmePostImage():
     res = requests.post(url='https://image.groupme.com/pictures',
                         data=data,
                         headers={'Content-Type': 'image/png',
-                                'X-Access-Token': API_KEY})
+                                'X-Access-Token': GME_API_KEY})
     url=res.json()[u'payload'][u'url']
     print(url)
     return url
 
 def groupmePostMessage(imageURL = None,text = None):
-    data = data={'Content-Type': 'application/json', 'bot_id' : BOT_ID}
+    data = data={'Content-Type': 'application/json', 'bot_id' : GME_BOT_ID}
     if text:
         data['text'] = text
         print(text)
@@ -148,7 +164,7 @@ def groupmePostMessage(imageURL = None,text = None):
 
 def oneDayPerDay(Day=None):
     if Day: #if a Day is specified, ensure it is the correct format and use it
-        if (tyfpe(Day) == isinstance(Day,tuple) and len(Day)==3):
+        if (type(Day) == isinstance(Day,tuple) and len(Day)==3):
             Day = date(Day[0],Day[1],Day[2])  
         else: #day is invalid
             print("Invalid Day specified, Please use '(YYYY,MM,D)'")
@@ -157,9 +173,12 @@ def oneDayPerDay(Day=None):
     print(Day)
     calendarDay = formatCalendar(Day)
     print(calendarDay['DayName'],calendarDay['MonthName'],calendarDay['DayNum'],',',calendarDay['YearNum'])
-    makeSquare(calendarDay)
-    url = groupmePostImage()
-    groupmePostMessage(url)
+    Square = makeSquare(calendarDay)
+    if(TG):
+        telegramPostImage(Square)
+    if(GME):
+        url = groupmePostImage()
+        groupmePostMessage(url)
     print('Done')
 
 

@@ -1,11 +1,22 @@
 ###############################################################################
 #
 #Configuratoin for One Day
-#Add Groupme API Key and Bot ID number from https://dev.groupme.com/
+#Add API log in data and configruation data here 
 # 
 ###############################################################################
 
-API_KEY = 'Super secret API key'
-BOT_ID = "Bot ID"
+##Global Config
+
 FONT = 'MICROSS.TTF'
+
+
+#Groupme
+GME = True
+GME_API_KEY = 'Super secret API key'
+#GME_BOT_ID = 'Super Secret Bot ID'
+
+#Telegram 
+TG = True
+TG_TOKEN = 'Super Secret Token' 
+TG_CHAT_ID = 'Chat ID'
 
